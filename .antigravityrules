@@ -1,0 +1,21 @@
+# CommandCenter Agent Rules (Superintelligent Best Practices)
+
+## 1. Safety & Integrity (Non-Negotiable)
+- **NO BATCH PROCESSING:** Never write or execute scripts to perform bulk edits on the knowledge base or codebase. All edits must be surgical and verified per-file.
+- **VERIFY OUTPUT:** After any modification, you must verify the file length and content to ensure no truncation or data loss occurred (especially when using LLM-based refactoring).
+- **CREDENTIALS:** Never print, log, or commit secrets or API keys.
+
+## 2. Architectural Guardrails
+- **KNOWLEDGE BASE:** The `knowledge-base/` directory is the source of truth for documentation. Use `SUMMARY.md` as your map.
+- **SUPABASE/DATABASE:** Every new table MUST have Row Level Security (RLS) enabled. Refer to `supabase/` for the current schema.
+- **NAMING:** Use kebab-case for all new files and directories.
+
+## 3. Operational Logic
+- **SURGICAL EDITS:** Prefer targeted `replace` calls over full-file `write_file` for large documents to minimize context usage and risk.
+- **CONTEXT EFFICIENCY:** Use `grep_search` and `glob` to locate specific code patterns before reading files. Do not "crawl" the directory tree.
+- **EMPIRICAL PROOF:** For bug fixes, you must reproduce the failure with a test or script before applying a fix.
+
+## 4. Learning & Delegation (Superuser Protocol)
+- **SUB-AGENT DELEGATION:** For repetitive tasks involving >3 files, high-volume output commands, or speculative research, you MUST delegate to the `generalist` or `codebase_investigator` sub-agents. Do not clutter the main session with batch operations.
+- **AGENT MEMORY:** Use `.gemini/antigravity/knowledge/` to store high-level architectural insights or "lessons learned." Do not create external "Phases" or "Implementation Plans" in the project space.
+- **NO HALLUCINATION:** If a requirement is missing (e.g., a specific contact email), search the codebase or `knowledge-base/` first. If it's not there, ask the user instead of inventing a placeholder.

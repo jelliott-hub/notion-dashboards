@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__claude_ai_Supabase__execute_sql",
+      "Bash(pip3 install:*)",
+      "Bash(python3 -m venv /tmp/xlenv)",
+      "Bash(/tmp/xlenv/bin/pip install:*)",
+      "Bash(/tmp/xlenv/bin/python:)",
+      "Bash(open:*)",
+      "Bash(/tmp/xlenv/bin/python:*)",
+      "Bash(supabase projects:*)",
+      "Bash(supabase db:*)",
+      "Bash(supabase --help)",
+      "Bash(supabase snippets:*)",
+      "Read(//Users/jackelliott/.claude/**)",
+      "Bash(ls ~/.claude/*.json)",
+      "Bash(supabase:*)",
+      "Bash(python3 -c \"import psycopg2; print\\('psycopg2 available'\\)\")",
+      "Bash(python3 -c \"import asyncpg; print\\('asyncpg available'\\)\")",
+      "Bash([ -d /tmp/xlenv ])",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(psql --version)",
+      "Bash(env)"
+    ]
+  }
+}

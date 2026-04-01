@@ -1,0 +1,31 @@
+-- Phase 1.9: Wrap refresh_fact_revenue() in a transaction-safe pattern
+--
+-- RESULT: No changes required.
+--
+-- Analysis (2026-04-01) confirmed that finance.refresh_fact_revenue() is
+-- already fully transaction-safe:
+--
+--   1. It is a plpgsql function with no COMMIT statements — it runs in a
+--      single implicit transaction. Any RAISE EXCEPTION rolls back the full
+--      transaction including the TRUNCATE calls.
+--
+--   2. SET LOCAL app.refresh_authorized = 'true' is transaction-scoped and
+--      resets automatically on rollback. No session-level SET statements
+--      are present.
+--
+--   3. The guard triggers (trg_guard_fact_revenue, trg_guard_fact_cogs) are
+--      FOR EACH ROW triggers and are NOT fired by TRUNCATE (PostgreSQL only
+--      fires FOR EACH ROW triggers on INSERT/UPDATE/DELETE, not TRUNCATE).
+--
+--   4. No RLS policies exist on fact_revenue or fact_cogs.
+--
+--   5. PostgreSQL MVCC ensures concurrent readers see the old snapshot until
+--      the transaction commits — they are never exposed to the empty-table
+--      intermediate state.
+--
+-- A staging-table swap pattern was evaluated but rejected: it adds complexity
+-- to an already-correct function. The reasonableness checks provide sufficient
+-- protection against bad data, and concurrent read exposure is minimal given
+-- the MVCC guarantee.
+--
+-- See: sql/results/phase1_9_refresh_safety.md for full analysis.
