@@ -37,13 +37,17 @@ with tab_close:
     render_close()
 
 with tab_pnl:
-    st.info("P&L Reconciliation — coming next task")
+    from apps.finance.tabs.pnl import render as render_pnl
+    render_pnl()
 
 with tab_ar:
-    st.info("AR Aging — coming soon")
+    from apps.finance.tabs.ar_aging import render as render_ar
+    render_ar()
 
 with tab_variance:
-    st.info("Variance Analysis — coming soon")
+    from apps.finance.tabs.variance import render as render_variance
+    render_variance()
 
 with tab_inbox:
-    st.info("Accounting Inbox — coming soon")
+    from apps.finance.tabs.accounting_inbox import render as render_inbox
+    render_inbox()
