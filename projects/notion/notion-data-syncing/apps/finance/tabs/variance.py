@@ -92,14 +92,6 @@ def render():
         ].copy()
         if not flagged_df.empty:
             flagged_summary = (
-                flagged_df.groupby("gl_name", as_index=False)["mom_pct_change"]
-                .apply(lambda s: s.abs().max())
-                .rename(columns={"mom_pct_change": "max_abs_mom"})
-                if "mom_pct_change" in flagged_df.columns
-                else flagged_df.groupby("gl_name", as_index=False)["mom_change"].sum()
-            )
-            # Re-do cleanly
-            flagged_summary = (
                 flagged_df.groupby("gl_name")["mom_pct_change"]
                 .apply(lambda s: s.abs().max())
                 .reset_index()

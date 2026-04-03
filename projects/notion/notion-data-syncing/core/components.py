@@ -1,4 +1,24 @@
-"""Reusable UI components rendered as branded HTML via st.html()."""
+"""
+Reusable UI components rendered as branded HTML via st.html().
+
+These components produce raw HTML strings styled with B4ALL brand colors.
+They don't depend on Streamlit widgets, so they render identically in any
+tab or layout context.
+
+Available components:
+    kpi_strip_html   — horizontal row of KPI metric cards
+    detail_panel_html — key-value detail panel (for row drill-through)
+    status_pill_html  — colored status badge (PASS, FAIL, WARN, etc.)
+
+Usage::
+
+    import streamlit as st
+    from core.components import kpi_strip_html, detail_panel_html, status_pill_html
+
+    st.html(kpi_strip_html([
+        {"label": "Revenue", "value": "$412K", "color": "#0D1B2A"},
+    ]))
+"""
 
 from core.theme import COLORS
 
@@ -15,8 +35,26 @@ def kpi_strip_html(items: list[dict]) -> str:
     """
     Render a horizontal strip of KPI cards as HTML.
 
-    Each item: {"label": str, "value": str, "color": str, "subtitle": str (optional),
-                "border_color": str (optional — left accent border)}
+    Args:
+        items: List of dicts, each with:
+            - "label" (str): metric name (e.g., "Revenue")
+            - "value" (str): formatted value (e.g., "$412K")
+            - "color" (str): hex color for the value text
+            - "subtitle" (str, optional): small text below value
+            - "border_color" (str, optional): left accent border color
+
+    Returns:
+        HTML string. Render with st.html().
+
+    Example::
+
+        st.html(kpi_strip_html([
+            {"label": "Total Deals", "value": "127", "color": "#0D1B2A"},
+            {"label": "Won", "value": "34", "color": "#22C55E",
+             "border_color": "#22C55E"},
+            {"label": "Pipeline", "value": "$1.2M", "color": "#2B7BE9",
+             "subtitle": "Open deals only"},
+        ]))
     """
     cards = []
     for item in items:
@@ -39,11 +77,23 @@ def kpi_strip_html(items: list[dict]) -> str:
 
 def detail_panel_html(title: str, fields: dict) -> str:
     """
-    Render an expandable detail panel with key-value pairs.
+    Render a detail panel with key-value pairs. Used for row drill-through.
 
     Args:
-        title: Panel header text
-        fields: dict of {label: value} pairs to display
+        title: Panel header text.
+        fields: Ordered dict of {"Label": "value"} pairs to display.
+
+    Returns:
+        HTML string. Render with st.html().
+
+    Example::
+
+        st.html(detail_panel_html("Invoice #1234 — Detail", {
+            "Client ID": "CLI-001",
+            "Amount Due": "$5,230.00",
+            "Days Outstanding": "47",
+            "Aging Bucket": "31-60",
+        }))
     """
     rows = []
     for label, value in fields.items():
@@ -68,11 +118,20 @@ def detail_panel_html(title: str, fields: dict) -> str:
 
 def status_pill_html(text: str, status: str) -> str:
     """
-    Render a colored status pill (PASS, FAIL, WARN, etc.).
+    Render a colored status pill badge.
 
     Args:
-        text: Display text
-        status: One of "success", "warning", "error", "info", "neutral"
+        text: Display text (e.g., "PASS", "FAIL", "WARN").
+        status: One of "success", "warning", "error", "info", "neutral".
+                Determines background and text color.
+
+    Returns:
+        HTML string. Render with st.html() or embed in other HTML.
+
+    Example::
+
+        st.html(status_pill_html("PASS", "success"))
+        st.html(status_pill_html("OVERDUE", "error"))
     """
     color = _STATUS_COLORS.get(status, COLORS["slate"])
     return f"""<span style="background:{color}18;color:{color};padding:3px 10px;

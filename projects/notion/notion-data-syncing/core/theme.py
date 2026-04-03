@@ -1,4 +1,35 @@
-"""B4ALL brand colors and chart theme configurations."""
+"""
+B4ALL brand colors and chart theme configurations.
+
+Color palette:
+    COLORS["navy"]       — #0D1B2A  primary text, headings
+    COLORS["blue"]       — #2B7BE9  primary accent, links
+    COLORS["blue_dark"]  — #1A5FC7  hover states, secondary accent
+    COLORS["blue_light"] — #E8F1FD  panel backgrounds, highlights
+    COLORS["bg"]         — #F4F6FA  page background
+    COLORS["white"]      — #FFFFFF  card backgrounds, plot area
+    COLORS["border"]     — #E2E8F0  borders, grid lines
+    COLORS["slate"]      — #64748B  secondary text, labels
+    COLORS["success"]    — #22C55E  positive status (pass, won, on-time)
+    COLORS["warning"]    — #F59E0B  caution status (warn, pending)
+    COLORS["error"]      — #E74C3C  negative status (fail, overdue, lost)
+
+COLOR_SEQUENCE is an 8-color palette for multi-series charts.
+
+Usage::
+
+    from core.theme import COLORS, COLOR_SEQUENCE, plotly_template
+
+    # Direct color access
+    fig.update_layout(paper_bgcolor=COLORS["bg"])
+
+    # Apply full template to a Plotly figure
+    fig.update_layout(template=plotly_template())
+
+    # ECharts theme dict
+    from core.theme import echarts_theme
+    theme = echarts_theme()
+"""
 
 import plotly.graph_objects as go
 
@@ -24,8 +55,8 @@ COLOR_SEQUENCE = [
     COLORS["warning"],
     COLORS["error"],
     COLORS["slate"],
-    "#8B5CF6",  # purple for extra series
-    "#EC4899",  # pink for extra series
+    "#8B5CF6",  # purple
+    "#EC4899",  # pink
 ]
 
 
