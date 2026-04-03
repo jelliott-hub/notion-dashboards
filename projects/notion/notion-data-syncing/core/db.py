@@ -49,7 +49,7 @@ def _get_supabase_key() -> str:
     return st.secrets.get("supabase", {}).get("anon_key", _DEFAULT_ANON_KEY)
 
 
-def query_view(view_name: str, schema: str = "notion_sync") -> pd.DataFrame:
+def query_view(view_name: str, schema: str = "notion_sync", filters: str = "") -> pd.DataFrame:
     """
     Query a Supabase view/table and return a cached, type-coerced DataFrame.
 
@@ -58,6 +58,8 @@ def query_view(view_name: str, schema: str = "notion_sync") -> pd.DataFrame:
                    Must be lowercase alphanumeric + underscores.
         schema: Supabase schema to query. Default "notion_sync".
                 Common schemas: "notion_sync", "analytics", "public".
+        filters: Optional PostgREST query params (e.g., "order=col.desc&limit=100",
+                 "col=eq.value"). Appended to the REST URL after pagination params.
 
     Returns:
         pd.DataFrame with automatic type coercion applied.
@@ -72,39 +74,62 @@ def query_view(view_name: str, schema: str = "notion_sync") -> pd.DataFrame:
 
         df = query_view("finance_pnl")
         df = query_view("mv_call_spine", schema="analytics")
+        df = query_view("mv_customer_concentration", schema="analytics",
+                        filters="order=evaluation_month.desc&limit=5000")
     """
     if not _VIEW_NAME_RE.match(view_name):
         raise ValueError(f"Invalid view name: {view_name!r}")
 
     try:
         st.runtime.exists()
-        return _cached_query(view_name, schema)
+        return _cached_query(view_name, schema, filters)
     except Exception:
-        return _fetch_view(view_name, schema)
+        return _fetch_view(view_name, schema, filters)
 
 
 @st.cache_data(ttl=CACHE_TTL_SECONDS, show_spinner="Loading data...")
-def _cached_query(view_name: str, schema: str) -> pd.DataFrame:
-    return _fetch_view(view_name, schema)
+def _cached_query(view_name: str, schema: str, filters: str) -> pd.DataFrame:
+    return _fetch_view(view_name, schema, filters)
 
 
-def _fetch_view(view_name: str, schema: str = "notion_sync") -> pd.DataFrame:
-    """Fetch all rows from a Supabase view via REST API."""
+def _fetch_view(view_name: str, schema: str = "notion_sync", filters: str = "") -> pd.DataFrame:
+    """Fetch all rows from a Supabase view via REST API with auto-pagination."""
     headers = {
         "apikey": _get_supabase_key(),
         "Accept": "application/json",
         "Accept-Profile": schema,
     }
 
-    url = f"{_get_supabase_url()}/rest/v1/{view_name}?limit=10000"
-    resp = requests.get(url, headers=headers, timeout=30)
-    resp.raise_for_status()
+    # If filters include a limit, use single-page fetch (no auto-pagination)
+    has_custom_limit = "limit=" in filters
 
-    data = resp.json()
-    if not data:
+    page_size = 1000
+    all_data: list[dict] = []
+    offset = 0
+
+    while True:
+        url = (f"{_get_supabase_url()}/rest/v1/{view_name}"
+               f"?limit={page_size}&offset={offset}")
+        if filters:
+            url += f"&{filters}"
+        if has_custom_limit:
+            # Custom limit in filters — override pagination, single request
+            url = f"{_get_supabase_url()}/rest/v1/{view_name}?{filters}"
+        resp = requests.get(url, headers=headers, timeout=30)
+        resp.raise_for_status()
+
+        page = resp.json()
+        if not page:
+            break
+        all_data.extend(page)
+        if has_custom_limit or len(page) < page_size:
+            break  # single-page or last page
+        offset += page_size
+
+    if not all_data:
         return pd.DataFrame()
 
-    df = pd.DataFrame(data)
+    df = pd.DataFrame(all_data)
     return _coerce_types(df)
 
 
