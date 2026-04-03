@@ -114,10 +114,12 @@ def render():
         ]
         if c in df.columns
     ]
-    show_df = df[table_cols_available].sort_values(
-        ["month_date"] if "month_date" in df.columns else [],
-        ascending=False,
-    ) if table_cols_available else df
+    if table_cols_available:
+        show_df = df[table_cols_available]
+        if "month_label" in show_df.columns:
+            show_df = show_df.sort_values("month_label", ascending=False)
+    else:
+        show_df = df
 
     event = st.dataframe(
         show_df,

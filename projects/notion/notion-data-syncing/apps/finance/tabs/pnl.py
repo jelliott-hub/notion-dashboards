@@ -84,7 +84,7 @@ def render():
         display_df = display_df[display_df["status"] == "PASS"]
 
     table_cols = ["gl_code", "gl_name", "pl_section", "hub_total", "qb_total", "delta", "status"]
-    display_df_show = display_df[table_cols].sort_values("abs_delta", ascending=False)
+    display_df_show = display_df[table_cols].assign(abs_delta=display_df["abs_delta"]).sort_values("abs_delta", ascending=False).drop(columns="abs_delta")
 
     event = st.dataframe(
         display_df_show,

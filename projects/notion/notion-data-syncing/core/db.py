@@ -55,4 +55,45 @@ def _fetch_view(view_name: str) -> pd.DataFrame:
     if not data:
         return pd.DataFrame()
 
-    return pd.DataFrame(data)
+    df = pd.DataFrame(data)
+    return _coerce_types(df)
+
+
+def _coerce_types(df: pd.DataFrame) -> pd.DataFrame:
+    """Coerce REST API string values to proper pandas types.
+    The REST API returns numbers as strings and dates as strings.
+    This fixes them so downstream code can use .format(), .sum(), etc."""
+    for col in df.columns:
+        # Skip empty columns
+        if df[col].dropna().empty:
+            continue
+
+        sample = df[col].dropna().iloc[0]
+
+        # Already typed correctly
+        if not isinstance(sample, str):
+            continue
+
+        # Try date columns (names ending in _date, _month, _at, _week, _start)
+        if any(col.endswith(s) for s in ("_date", "_month", "_at", "_week", "_start")):
+            try:
+                df[col] = pd.to_datetime(df[col], errors="coerce")
+                continue
+            except Exception:
+                pass
+
+        # Try numeric conversion
+        try:
+            converted = pd.to_numeric(df[col], errors="coerce")
+            # If most non-null values converted successfully, use it
+            if converted.notna().sum() >= df[col].notna().sum() * 0.5:
+                df[col] = converted
+                continue
+        except Exception:
+            pass
+
+        # Try boolean
+        if set(df[col].dropna().unique()) <= {"true", "false", "True", "False"}:
+            df[col] = df[col].map({"true": True, "false": False, "True": True, "False": False})
+
+    return df
