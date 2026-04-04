@@ -4,6 +4,19 @@
 **Status:** Draft
 **Scope:** B4ALL Knowledge Base database (`37ac70bb`) — 715 articles, ~37K blocks, 13 views
 
+## CRITICAL: Target Scope
+
+**There is ONE database. Ignore everything else in the Notion workspace.**
+
+| Field | Value |
+|---|---|
+| **Database name** | B4ALL Knowledge Base |
+| **Database ID** | `37ac70bb-1cc6-4bdc-a52e-f2c8587b636e` |
+| **Data Source ID** | `fd44d1a1-ef63-4a64-badb-366b38794cb3` |
+| **Database URL** | `https://www.notion.so/37ac70bb1cc64bdca52ef2c8587b636e` |
+
+The workspace has ~90 other data sources — do NOT query, create, modify, or reference any of them. Every operation in this spec targets this single database and its pages.
+
 ## Problem
 
 The Notion MCP tools can read pages/properties and manage database schemas, but **cannot** manipulate blocks (the actual content of articles). This means we cannot:

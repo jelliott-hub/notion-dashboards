@@ -12,6 +12,24 @@
 
 ---
 
+## CRITICAL: Target Scope
+
+**There is ONE database. Ignore everything else in the Notion workspace.**
+
+| Field | Value |
+|---|---|
+| **Database name** | B4ALL Knowledge Base |
+| **Database ID** | `37ac70bb-1cc6-4bdc-a52e-f2c8587b636e` |
+| **Data Source ID** | `fd44d1a1-ef63-4a64-badb-366b38794cb3` |
+| **Database URL** | `https://www.notion.so/37ac70bb1cc64bdca52ef2c8587b636e` |
+| **Default view URL** | `https://www.notion.so/37ac70bb1cc64bdca52ef2c8587b636e?v=33713d3677c3814ea37d000c82d297c2` |
+
+This database has ~715 article pages, ~37K content blocks, and 13 views. It lives under the "Company Knowledge Base" page. The workspace has ~90 other data sources — **do NOT query, create, modify, or reference any of them.** Every Notion API call in this plan targets this single database and its pages.
+
+If a Notion MCP tool returns multiple databases, filter to `37ac70bb-1cc6-4bdc-a52e-f2c8587b636e`. If asked to "search" or "list" databases, you already have the ID — don't search.
+
+---
+
 ## File Structure
 
 ```
