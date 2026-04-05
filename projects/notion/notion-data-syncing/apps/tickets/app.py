@@ -13,7 +13,7 @@ import plotly.graph_objects as go
 import pandas as pd
 
 from core.db import query_view
-from apps.analytics.style import (
+from core.style import (
     inject_css, metric_card, card_header, section_label,
     page_header, chart_layout, CHART_COLORS, PALETTE,
 )
