@@ -14,7 +14,10 @@ DOMAIN_COLORS = {
     "sales":    PALETTE["amber"],
     "tickets":  PALETTE["navy"],
     "revenue":  PALETTE["blue_dark"],
+    "pnl":      PALETTE["red"],
 }
+
+_FALLBACK_COLOR = PALETTE["secondary"]
 
 
 def render():
@@ -32,7 +35,7 @@ def render():
     """)
 
     for w in WIDGETS:
-        domain_clr = DOMAIN_COLORS.get(w["domain"], PALETTE["slate"])
+        domain_clr = DOMAIN_COLORS.get(w["domain"], _FALLBACK_COLOR)
         type_label = "metric strip" if w["type"] == "metric" else "chart"
         with st.container(border=True):
             st.html(f"""
