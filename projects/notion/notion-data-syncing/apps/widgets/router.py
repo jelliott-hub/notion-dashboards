@@ -18,15 +18,18 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../.."))
 import streamlit as st
 
 from apps.widgets._registry import WIDGETS
+from apps.widgets._base import widget_page
 
-_WIDGET_IDS = {w["id"] for w in WIDGETS}
+_WIDGET_MAP = {w["id"]: w for w in WIDGETS}
 
 widget_id = st.query_params.get("widget", "catalog")
 
 if widget_id == "catalog":
     mod = importlib.import_module("apps.widgets.catalog")
     mod.render()
-elif widget_id in _WIDGET_IDS:
+elif widget_id in _WIDGET_MAP:
+    meta = _WIDGET_MAP[widget_id]
+    widget_page(meta["title"], meta["default_height"])
     mod = importlib.import_module(f"apps.widgets.{widget_id}")
     mod.render()
 else:
